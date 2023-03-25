@@ -41,3 +41,8 @@ game.layout
 /workspaces/gamelog.txt
 /workspaces/xmllog
 /workspaces
+
+
+# Added by cargo
+
+/target
