@@ -3,7 +3,6 @@ use crossterm::{
     event::{self, Event as CEvent, KeyCode},
     terminal::{disable_raw_mode, enable_raw_mode},
 };
-use serde::{Deserialize, Serialize};
 use std::io;
 use std::sync::mpsc;
 use std::thread;
@@ -29,13 +28,15 @@ enum Event<I> {
 
 #[derive(Copy, Clone, Debug)]
 enum MenuItem {
+    Opening,
     Home,
 }
 
 impl From<MenuItem> for usize {
     fn from(input: MenuItem) -> usize {
         match input {
-            MenuItem::Home => 0,
+            MenuItem::Opening => 0,
+            MenuItem::Home => 1,
         }
     }
 }
@@ -128,6 +129,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             rect.render_widget(tabs, chunks[0]);
             match active_menu_item {
+                MenuItem::Opening => rect.render_widget(render_opening(), chunks[1]),
                 MenuItem::Home => rect.render_widget(render_home(), chunks[1]),
             }
             rect.render_widget(copyright, chunks[2]);
@@ -140,6 +142,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     break;
                 }
                 KeyCode::Char('h') => active_menu_item = MenuItem::Home,
+                KeyCode::Char('o') => active_menu_item = MenuItem::Opening,
                 _ => {}
             },
             Event::Tick => {}
@@ -171,4 +174,42 @@ fn render_home<'a>() -> Paragraph<'a> {
             .border_type(BorderType::Plain),
     );
     home
+}
+fn render_opening<'a>() -> Paragraph<'a> {
+    let opening = Paragraph::new(vec![
+        Spans::from(vec![Span::styled(
+                "Liberal Crime Squad",
+                Style::default().fg(Color::Green),
+            )]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("Inspired by the 1983 version of Oubliette")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("\"Let's get on with it!\"")]),
+        Spans::from(vec![Span::raw("-- Grimith")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("v3.9 Copyright (C) 2002-4, Tarn Adams")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("A Bay 12 Games Production")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("http://bay12games.com/lcs/")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("V5.0.0 A Rust Rewright, mostly for fun and learning")]),
+        Spans::from(vec![Span::raw("Maintained by the Open Source Community")]),
+        Spans::from(vec![Span::raw("https://github.com/cinmay/Liberal-Crime-Squad")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("A huge thanks to the 4.12 community for their work on imporoving game.")]),
+        Spans::from(vec![Span::raw("https://github.com/King-Drake/Liberal-Crime-Squad")]),
+        Spans::from(vec![Span::raw("")]),
+        Spans::from(vec![Span::raw("Press ESC now to quit. Quitting later causes your progress to be saved.")]),
+        Spans::from(vec![Span::raw("Press any other key to pursue your Liberal Agenda!")]),
+    ])
+    .alignment(Alignment::Center)
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().fg(Color::White))
+            .title("Opening")
+            .border_type(BorderType::Plain),
+    );
+    opening
 }
