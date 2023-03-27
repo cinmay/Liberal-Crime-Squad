@@ -193,7 +193,7 @@ fn render_opening<'a>() -> Paragraph<'a> {
         Spans::from(vec![Span::raw("")]),
         Spans::from(vec![Span::raw("http://bay12games.com/lcs/")]),
         Spans::from(vec![Span::raw("")]),
-        Spans::from(vec![Span::raw("V5.0.0 A Rust Rewright, mostly for fun and learning")]),
+        Spans::from(vec![Span::raw("A Rust Rewright, mostly for fun and learning")]),
         Spans::from(vec![Span::raw("Maintained by the Open Source Community")]),
         Spans::from(vec![Span::raw("https://github.com/cinmay/Liberal-Crime-Squad")]),
         Spans::from(vec![Span::raw("")]),
