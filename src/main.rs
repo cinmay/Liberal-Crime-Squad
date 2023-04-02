@@ -78,6 +78,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut pet_list_state = ListState::default();
     pet_list_state.select(Some(0));
 
+    let mut savefile_name = String::new();
     loop {
         terminal.draw(|rect| {
             let size = rect.size();
@@ -97,7 +98,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             match active_menu_item {
                 MenuItem::Opening => rect.render_widget(render_opening(), chunks[1]),
                 MenuItem::Home => rect.render_widget(render_home(), chunks[1]),
-                MenuItem::SavegameName => rect.render_widget(render_savegame_name(), chunks[1]),
+                MenuItem::SavegameName => rect.render_widget(render_savegame_name(&savefile_name), chunks[1]),
             }
         })?;
 
@@ -139,7 +140,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             terminal.show_cursor()?;
                             break;
                         }
-                        _ => {}
+                        KeyCode::Enter =>  active_menu_item = MenuItem::Home,
+
+                        KeyCode::Backspace => {
+                            savefile_name.pop();
+                        }
+                        _ => {
+                            if let KeyCode::Char(c) = event.code {
+                                savefile_name.push(c);
+                            }
+                        }
                     },
                     Event::Tick => {}
                 }
@@ -212,10 +222,11 @@ fn render_opening<'a>() -> Paragraph<'a> {
     opening
 }
 
-fn render_savegame_name<'a>() -> Paragraph<'a> {
+fn render_savegame_name<'a>(savefile_name:&'a String ) -> Paragraph<'a> {
     let savegame_name = Paragraph::new(vec![
         Spans::from(vec![Span::raw("In what world will you pursue your Liberal Agenda?")]),
         Spans::from(vec![Span::raw("Enter a name for the save file.")]),
+        Spans::from(vec![Span::raw(savefile_name)]),
     ])
     .alignment(Alignment::Center)
     .block(
