@@ -220,7 +220,7 @@ const string CONST_YOUR_POSSESSIONS_AT_THIS_LOCATION_HAVE_BEEN_MOVED_TO_THE_SHEL
 const string CONST_I_D_LIKE_TO_RENT_A_ROOM = "\"I'd like to rent a room.\"";
 const string CONST_PUT_SOME_CLOTHES_ON_BEFORE_I_CALL_THE_COPS = "\"Put some clothes on before I call the cops.\"";
 const string CONST_IT_LL_BE = "\"It'll be $";
-const string CONST_A_MONTH = " a month.";
+counst string CONST_A_MONTH = " a month.";
 const string CONST_I_LL_NEED = "I'll need $";
 const string CONST_NOW_AS_A_SECURITY_DEPOSIT = " now as a security deposit.\"";
 const string CONST_A_ACCEPT = "A - Accept.";

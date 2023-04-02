@@ -30,6 +30,7 @@ enum Event<I> {
 enum MenuItem {
     Opening,
     Home,
+    SavegameName,
 }
 
 impl From<MenuItem> for usize {
@@ -37,6 +38,7 @@ impl From<MenuItem> for usize {
         match input {
             MenuItem::Opening => 0,
             MenuItem::Home => 1,
+            MenuItem::SavegameName => 2,
         }
     }
 }
@@ -93,17 +95,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
                 .split(size);
 
-            let copyright = Paragraph::new("pet-CLI 2020 - all rights reserved")
-                .style(Style::default().fg(Color::LightCyan))
-                .alignment(Alignment::Center)
-                .block(
-                    Block::default()
-                        .borders(Borders::ALL)
-                        .style(Style::default().fg(Color::White))
-                        .title("Copyright")
-                        .border_type(BorderType::Plain),
-                );
-
             let menu = menu_titles
                 .iter()
                 .map(|t| {
@@ -131,18 +122,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             match active_menu_item {
                 MenuItem::Opening => rect.render_widget(render_opening(), chunks[1]),
                 MenuItem::Home => rect.render_widget(render_home(), chunks[1]),
+                MenuItem::SavegameName => rect.render_widget(render_savegame_name(), chunks[1]),
             }
-            rect.render_widget(copyright, chunks[2]);
         })?;
         match rx.recv()? {
             Event::Input(event) => match event.code {
-                KeyCode::Char('q') => {
+                KeyCode::Esc => {
                     disable_raw_mode()?;
                     terminal.show_cursor()?;
                     break;
                 }
                 KeyCode::Char('h') => active_menu_item = MenuItem::Home,
                 KeyCode::Char('o') => active_menu_item = MenuItem::Opening,
+                KeyCode::Char('s') => active_menu_item = MenuItem::SavegameName,
                 _ => {}
             },
             Event::Tick => {}
@@ -212,4 +204,20 @@ fn render_opening<'a>() -> Paragraph<'a> {
             .border_type(BorderType::Plain),
     );
     opening
+}
+
+fn render_savegame_name<'a>() -> Paragraph<'a> {
+    let savegame_name = Paragraph::new(vec![
+        Spans::from(vec![Span::raw("In what world will you pursue your Liberal Agenda?")]),
+        Spans::from(vec![Span::raw("Enter a name for the save file.")]),
+    ])
+    .alignment(Alignment::Center)
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().fg(Color::White))
+            .title("Savegame Name")
+            .border_type(BorderType::Plain),
+    );
+    savegame_name
 }
