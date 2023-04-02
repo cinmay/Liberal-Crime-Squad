@@ -74,7 +74,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
 
-    let menu_titles = vec!["Home", "Quit"];
     let mut active_menu_item = MenuItem::Home;
     let mut pet_list_state = ListState::default();
     pet_list_state.select(Some(0));
@@ -95,49 +94,56 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
                 .split(size);
 
-            let menu = menu_titles
-                .iter()
-                .map(|t| {
-                    let (first, rest) = t.split_at(1);
-                    Spans::from(vec![
-                        Span::styled(
-                            first,
-                            Style::default()
-                                .fg(Color::Yellow)
-                                .add_modifier(Modifier::UNDERLINED),
-                        ),
-                        Span::styled(rest, Style::default().fg(Color::White)),
-                    ])
-                })
-                .collect();
-
-            let tabs = Tabs::new(menu)
-                .select(active_menu_item.into())
-                .block(Block::default().title("Menu").borders(Borders::ALL))
-                .style(Style::default().fg(Color::White))
-                .highlight_style(Style::default().fg(Color::Yellow))
-                .divider(Span::raw("|"));
-
-            rect.render_widget(tabs, chunks[0]);
             match active_menu_item {
                 MenuItem::Opening => rect.render_widget(render_opening(), chunks[1]),
                 MenuItem::Home => rect.render_widget(render_home(), chunks[1]),
                 MenuItem::SavegameName => rect.render_widget(render_savegame_name(), chunks[1]),
             }
         })?;
-        match rx.recv()? {
-            Event::Input(event) => match event.code {
-                KeyCode::Esc => {
-                    disable_raw_mode()?;
-                    terminal.show_cursor()?;
-                    break;
+
+        match active_menu_item {
+            MenuItem::Opening => {
+                match rx.recv()? {
+                    Event::Input(event) => match event.code {
+                        KeyCode::Esc => {
+                            disable_raw_mode()?;
+                            terminal.show_cursor()?;
+                            break;
+                        }
+                        _ => active_menu_item = MenuItem::SavegameName,
+                    },
+                    Event::Tick => {}
                 }
-                KeyCode::Char('h') => active_menu_item = MenuItem::Home,
-                KeyCode::Char('o') => active_menu_item = MenuItem::Opening,
-                KeyCode::Char('s') => active_menu_item = MenuItem::SavegameName,
-                _ => {}
-            },
-            Event::Tick => {}
+
+            }
+            MenuItem::Home => {
+                match rx.recv()? {
+                    Event::Input(event) => match event.code {
+                        KeyCode::Char('q') => {
+                            disable_raw_mode()?;
+                            terminal.show_cursor()?;
+                            break;
+                        }
+                        KeyCode::Char('h') => active_menu_item = MenuItem::Home,
+                        KeyCode::Char('o') => active_menu_item = MenuItem::Opening,
+                        _ => {}
+                    },
+                    Event::Tick => {}
+                }
+            }
+            MenuItem::SavegameName  => {
+                match rx.recv()? {
+                    Event::Input(event) => match event.code {
+                        KeyCode::Esc => {
+                            disable_raw_mode()?;
+                            terminal.show_cursor()?;
+                            break;
+                        }
+                        _ => {}
+                    },
+                    Event::Tick => {}
+                }
+            }
         }
     }
 
